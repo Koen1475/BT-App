@@ -32,8 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, snapshot) {
           final bluetoothOn = snapshot.data ?? false;
           return Scaffold(
+            backgroundColor: Colors.black,
             appBar: AppBar(
-              title: const Text("Bluetooth Connect"),
+              backgroundColor: Colors.black,
+              title: const Text(
+                "Bluetooth Connect",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             floatingActionButton: switch (isListening) {
               true => null,
@@ -45,9 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         setState(() => isListening = true);
                       },
                   },
-                  backgroundColor: bluetoothOn
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
+                  backgroundColor: Colors.blue,
                   child: const Icon(Icons.wifi_tethering),
                 ),
             },
@@ -101,28 +104,58 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         if (!bluetoothOn)
                           const Center(
-                            child: Text("Turn bluetooth on"),
+                            child: Text(
+                              "Turn bluetooth on",
+                              style: TextStyle(color: Colors.orange),
+                            ),
                           ),
                         ValueListenableBuilder(
-                            valueListenable: bondedDevices,
-                            builder: (context, devices, child) {
-                              return Expanded(
-                                child: ListView.builder(
-                                  itemCount: bondedDevices.value.length,
-                                  itemBuilder: (context, index) {
-                                    final device = devices[index];
-                                    return ListTile(
-                                      title: Text(device.name),
-                                      subtitle: Text(device.address),
-                                      onTap: () {
-                                        allBluetooth
-                                            .connectToDevice(device.address);
-                                      },
-                                    );
-                                  },
-                                ),
-                              );
-                            })
+                          valueListenable: bondedDevices,
+                          builder: (context, devices, child) {
+                            return Expanded(
+                              child: ListView.builder(
+                                itemCount: bondedDevices.value.length,
+                                itemBuilder: (context, index) {
+                                  final device = devices[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 8.0), // Extra bovenste opvulling
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Color.fromARGB(30, 255, 255,
+                                            255), // Achtergrondkleur van de container
+                                        borderRadius: BorderRadius.circular(
+                                            12.0), // Afgeronde hoeken
+                                      ),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 8.0,
+                                            horizontal:
+                                                16.0), // Aanpassen van interne opvulling
+                                        title: Text(
+                                          device.name,
+                                          style: TextStyle(
+                                              color: Colors
+                                                  .blue), // Tekstkleur van de titel
+                                        ),
+                                        subtitle: Text(
+                                          device.address,
+                                          style: TextStyle(
+                                              color: Colors
+                                                  .blue), // Tekstkleur van de subtitel
+                                        ),
+                                        onTap: () {
+                                          allBluetooth
+                                              .connectToDevice(device.address);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        )
                       ],
                     ),
                   ),

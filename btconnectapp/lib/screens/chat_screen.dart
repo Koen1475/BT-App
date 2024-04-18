@@ -37,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 26, 26, 26),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -46,6 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+        backgroundColor: Colors.black,
         body: Column(
           children: [
             Expanded(
@@ -63,7 +65,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       alignment:
                           message.isMe ? Alignment.topRight : Alignment.topLeft,
-                      child: Text(message.message),
+                      child: Text(
+                        message.message,
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   );
                 },
@@ -74,26 +79,29 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: messageController,
+                    style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Color.fromARGB(255, 26, 26, 26),
                       enabledBorder: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 IconButton(
-                  onPressed: () {
-                    final message = messageController.text;
-                    allBluetooth.sendMessage(message);
-                    messageController.clear();
-                    messages.add(
-                      Message(
-                        message: message,
-                        isMe: true,
-                      ),
-                    );
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.send),
-                )
+                    onPressed: () {
+                      final message = messageController.text;
+                      allBluetooth.sendMessage(message);
+                      messageController.clear();
+                      messages.add(
+                        Message(
+                          message: message,
+                          isMe: true,
+                        ),
+                      );
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.send),
+                    color: Colors.blue)
               ],
             )
           ],
