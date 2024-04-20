@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart'; // Add this import for file picking
+import 'package:file_picker/file_picker.dart';
 import 'package:btconnectapp/main.dart';
 import 'package:btconnectapp/message.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:permission_handler/permission_handler.dart'; // Import the permission_handler package
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -20,11 +21,16 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     allBluetooth.listenForData.listen((event) {
-      messages.add(Message(
-        message: event.toString(),
-        isMe: false,
-      ));
-      setState(() {});
+      if (event != null) {
+        messages.add(Message(
+          message: event.toString(),
+          isMe: false,
+        ));
+        setState(() {});
+      } else {
+        // Handle error or connection loss
+        // You can implement a retry mechanism here
+      }
     });
   }
 
@@ -35,15 +41,27 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _sendFile(Uint8List fileBytes) {
-    allBluetooth.sendMessage(fileBytes as String);
+    try {
+      allBluetooth.sendMessage(fileBytes as String);
+    } catch (e) {
+      // Handle error
+    }
     // You might want to display some indication that the file is being sent
   }
 
   Future<void> _pickAndSendFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      Uint8List fileBytes = result.files.single.bytes!;
-      _sendFile(fileBytes);
+    // Request permission to access external storage
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
+      // Permission granted, proceed with file picking
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null) {
+        Uint8List fileBytes = result.files.single.bytes!;
+        _sendFile(fileBytes);
+      }
+    } else {
+      // Permission denied
+      print('Permission denied to read external storage');
     }
   }
 
@@ -108,15 +126,19 @@ class _ChatScreenState extends State<ChatScreen> {
               IconButton(
                 onPressed: () {
                   final message = messageController.text;
-                  allBluetooth.sendMessage(message);
-                  messageController.clear();
-                  messages.add(
-                    Message(
-                      message: message,
-                      isMe: true,
-                    ),
-                  );
-                  setState(() {});
+                  try {
+                    allBluetooth.sendMessage(message);
+                    messageController.clear();
+                    messages.add(
+                      Message(
+                        message: message,
+                        isMe: true,
+                      ),
+                    );
+                    setState(() {});
+                  } catch (e) {
+                    // Handle error
+                  }
                 },
                 icon: const Icon(Icons.send),
                 color: Colors.blue,
